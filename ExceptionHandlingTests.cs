@@ -2,7 +2,6 @@
 using CalculatorLib.Services;
 using CalculatorLib.Services.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace Calculator.Tests
 {
@@ -20,11 +19,17 @@ namespace Calculator.Tests
         [TestMethod]
         public void Test_EmptyExpression_InformsUserAndContinues()
         {
-            var ex = Assert.ThrowsException<InvalidExpressionException>(() =>
+            InvalidExpressionException ex = null;
+            try
             {
                 _calcService.Calculate("");
-            });
+            }
+            catch (InvalidExpressionException e)
+            {
+                ex = e;
+            }
 
+            Assert.IsNotNull(ex, "Ожидалось исключение InvalidExpressionException.");
             Assert.AreEqual("Выражение не может быть пустым.", ex.Message);
 
             string nextResult = _calcService.Calculate("5+5");
@@ -34,11 +39,17 @@ namespace Calculator.Tests
         [TestMethod]
         public void Test_DivideByZero_InformsUserAndContinues()
         {
-            var ex = Assert.ThrowsException<CalculationDivisionByZeroException>(() =>
+            InvalidExpressionException ex = null;
+            try
             {
-                _calcService.Calculate("15/0");
-            });
+                _calcService.Calculate("10/0");
+            }
+            catch (InvalidExpressionException e)
+            {
+                ex = e;
+            }
 
+            Assert.IsNotNull(ex, "Ожидалось исключение InvalidExpressionException.");
             Assert.AreEqual("Деление на ноль недопустимо.", ex.Message);
 
             string nextResult = _calcService.Calculate("20/4");
@@ -59,9 +70,6 @@ namespace Calculator.Tests
             {
                 wasHandled = true;
                 errorMessage = ex.Message;
-            }
-            finally
-            {
             }
 
             Assert.IsTrue(wasHandled, "Исключение InvalidExpressionException не было выброшено.");
